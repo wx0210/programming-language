@@ -7,44 +7,7 @@ fun same_string(s1 : string, s2 : string) =
     s1 = s2
 
 (* put your solutions for problem 1 here *)
-fun hd xs =
-    case xs of
-       [] => raise List.Empty   
-     | x :: _ => x
 
-fun tl xs =
-    case xs of
-        _ :: xs' => xs'
-     | [] => raise List.Empty
- 
-fun null xs =
-    case xs of
-       [] => true
-     | _ => false
-
-fun isnot_in (x : string, xs : string list) =
-    if null xs
-    then true
-    else 
-        if same_string(x, hd xs)
-        then false
-        else isnot_in(x, tl xs)
-
-fun all_except_option (x : string, xs : string list) =
-    if isnot_in(x, xs)
-    then NONE
-    else 
-        let
-            fun kick_off(x : string, xs : string list) =
-                if null xs
-                then []
-                else 
-                    if same_string(x , hd xs)
-                    then kick_off(x, tl xs)
-                    else hd xs :: kick_off(x, tl xs)
-        in
-            SOME (kick_off(x,xs))
-        end
 
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
