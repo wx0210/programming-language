@@ -37,7 +37,7 @@ fun similar_names (xss, {first,middle,last}) =
 	fun local_helper [] = []
 	  | local_helper (x :: xs) = [{first = x, middle = middle, last = last}] @ local_helper(xs)
     in
-	[first,middle,last] :: local_helper(subs)
+	[{first,middle,last}] :: local_helper(subs)
     end
 	
 (* you may assume that Num is always used with values 2, 3, ..., 10
