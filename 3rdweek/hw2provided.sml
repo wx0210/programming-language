@@ -71,16 +71,57 @@ fun remove_card ([], c, e) = raise e
   | remove_card (x :: xs, c, e) =
     case x = c of
 	true => xs
-      | false => x :: remove_card(xs, c, e)
+      | false => x :: remove_card (xs, c, e)
 
-fun all_same_color ([]) = true
-  | all_same_color (x :: []) = true
-  | all_same_color (xs) =
+fun all_same_color xs =
+    case xs of
+	[] => true
+      | x :: [] => true
+      | x :: xs =>
+	let
+	    val color = card_color(x)
+	    fun check_same_color [] = true
+	      | check_same_color (h :: hs) =
+		case card_color (h) = color of
+		    false => false
+		  | true => check_same_color hs
+	in
+	    check_same_color xs
+	end
+
+fun sum_cards xs =
     let
-	
+	fun tail_helper ([], ans) = ans
+	  | tail_helper (x :: xs', ans) = tail_helper(xs', card_value(x) + ans) 
     in
-	
+	tail_helper (xs,0)
     end
+
+fun score(cards, goal) =
+  let
+    fun preliminary_score(sum) =
+      case sum > goal
+        of true => 3 * (sum - goal)
+         | false => goal - sum
+
+    fun final_score(pscore, true) = pscore div 2
+      | final_score(pscore, false) = pscore
+  in
+    final_score(preliminary_score(sum_cards(cards)), all_same_color(cards))
+  end
+
+fun officiate(cards, moves, goal) =
+  let
+    fun replay_game(_, [], heldcards) = score(heldcards, goal)
+      | replay_game([], Draw::moves, heldcards) = score(heldcards, goal)
+      | replay_game(cards, Discard card::moves, heldcards) =
+        replay_game(cards, moves, remove_card(heldcards, card, IllegalMove))
+      | replay_game(card::restcards, Draw::moves, heldcards) =
+        case sum_cards(card::heldcards) > goal
+          of true => score(card::heldcards, goal)
+           | false => replay_game(restcards, moves, card::heldcards)
+  in
+    replay_game(cards, moves, [])
+  end
 	
-    
-    
+	
