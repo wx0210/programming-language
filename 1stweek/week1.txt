@@ -1,0 +1,2 @@
+This week we will learn a new language - sml.
+fuctional programming!
