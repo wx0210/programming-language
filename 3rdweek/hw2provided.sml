@@ -23,7 +23,7 @@ fun get_substitutions1 ([], str) = []
 fun get_substitutions2 ([] ,str) = []
   | get_substitutions2 (xss, str) =
     let
-	fun tail_helper ([], _) = []
+	fun tail_helper ([], ans) = ans
 	  | tail_helper (x :: xs, ans) =
 	    case all_except_option(str, x)
 	     of NONE => tail_helper(xs, ans)
@@ -31,13 +31,14 @@ fun get_substitutions2 ([] ,str) = []
     in
 	tail_helper(xss, [])
     end
-fun similar_names (xss, {first,middle,last}) =
+	
+fun similar_names (xss, {first = a, middle = b, last = c}) =
     let
-	val subs = get_substitutions2(xss, first)
+	val subs = get_substitutions2(xss, a)
 	fun local_helper [] = []
-	  | local_helper (x :: xs) = [{first = x, middle = middle, last = last}] @ local_helper(xs)
+	  | local_helper (x :: xs) = [{first = x, middle = b, last = c}] @ local_helper(xs)
     in
-	[first,middle,last] :: local_helper(subs)
+	[{first = a, middle = b, last = c}] @ local_helper(subs)
     end
 	
 (* you may assume that Num is always used with values 2, 3, ..., 10
@@ -52,3 +53,34 @@ datatype move = Discard of card | Draw
 exception IllegalMove
 
 (* put your solutions for problem 2 here *)
+
+fun card_color (card) =
+    case card of
+	(Clubs,_) => Black
+      | (Spades,_) => Black
+      | (Diamonds,_) => Red
+      | (Hearts,_) => Red
+
+fun card_value (card) =
+    case card of
+	(_,Num x) => x
+      | (_,Ace) => 11
+      | (_,_) => 10 
+
+fun remove_card ([], c, e) = raise e
+  | remove_card (x :: xs, c, e) =
+    case x = c of
+	true => xs
+      | false => x :: remove_card(xs, c, e)
+
+fun all_same_color ([]) = true
+  | all_same_color (x :: []) = true
+  | all_same_color (xs) =
+    let
+	
+    in
+	
+    end
+	
+    
+    
