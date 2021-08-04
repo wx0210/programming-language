@@ -110,12 +110,5 @@ fun score (xs, goal) =
 	final_score(preliminary_score(sum_cards(xs)), all_same_color(xs))
     end
 
-fun officiate (cs, ms, goal) =
-    let
-	fun game_on (held_cards, [], _) = score(held_cards)
-	  | game_on (held_cards, _, []) = score(held_cards)
-	  | game_on (held_cards, c :: cs, m :: ms) = 
-    in
-	
-    end
+
 	
