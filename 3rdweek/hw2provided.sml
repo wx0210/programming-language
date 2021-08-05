@@ -7,13 +7,15 @@ fun same_string(s1 : string, s2 : string) =
     s1 = s2
 
 (* put your solutions for problem 1 here *)
-fun all_except_option (str, []) = NONE
-  | all_except_option (str, x :: xs) =
-    case (same_string(str,x), all_except_option(str, xs))
-	 of (true, _) => SOME(xs)
-	  | (false, NONE) => NONE
-	  | (false, SOME(y)) => SOME(x :: y)
-
+fun all_except_option (s, xs) =
+    case xs of
+	[] => NONE
+      | x :: xs' => if same_string (s, x)
+		    then SOME xs'
+		    else case all_except_option (s, xs') of
+			     NONE => NONE
+			   | SOME y => SOME(x :: y)
+					  
 fun get_substitutions1 ([], str) = []
   | get_substitutions1 (x :: xs, str) =
     case all_except_option(str, x)
@@ -34,11 +36,10 @@ fun get_substitutions2 ([] ,str) = []
 	
 fun similar_names (xss, {first = a, middle = b, last = c}) =
     let
-	val subs = get_substitutions2(xss, a)
 	fun local_helper [] = []
-	  | local_helper (x :: xs) = [{first = x, middle = b, last = c}] @ local_helper(xs)
+	  | local_helper (x :: xs) = {first = x, middle = b, last = c} :: local_helper(xs)
     in
-	[{first = a, middle = b, last = c}] @ local_helper(subs)
+	{first = a, middle = b, last = c} :: local_helper(get_substitutions2(xss, a))
     end
 	
 (* you may assume that Num is always used with values 2, 3, ..., 10
@@ -71,23 +72,13 @@ fun remove_card ([], c, e) = raise e
   | remove_card (x :: xs, c, e) =
     case x = c of
 	true => xs
-      | false => x :: remove_card (xs, c, e)
+      | false => x :: remove_card(xs, c, e)
 
 fun all_same_color xs =
     case xs of
 	[] => true
-      | x :: [] => true
-      | x :: xs =>
-	let
-	    val color = card_color(x)
-	    fun check_same_color [] = true
-	      | check_same_color (h :: hs) =
-		case card_color (h) = color of
-		    false => false
-		  | true => check_same_color hs
-	in
-	    check_same_color xs
-	end
+      | [_] => true
+      | head :: neck :: tail => card_color head = card_color neck andalso all_same_color(neck :: tail) 
 
 fun sum_cards xs =
     let
@@ -99,16 +90,59 @@ fun sum_cards xs =
 
 fun score (xs, goal) =
     let
-	fun preliminary_score (sum) =
-	    case sum > goal of
-		true => 3 * (sum -goal)
-	     |  false => (goal -sum)
-
-	fun final_score (pscore, true) = pscore div 2
-	  | final_score (pscore, false) = pscore  
+	val sum = sum_cards xs
     in
-	final_score(preliminary_score(sum_cards(xs)), all_same_color(xs))
+	(if sum >= goal then 3* (sum - goal) else goal - sum)
+	    div (if all_same_color xs then 2 else 1)
     end
 
+fun officiate (cards, plays, goal) =
+    let
+	fun loop (current_cards, cards_left, plays_left) =
+	    case plays_left of
+		[] => score(current_cards,goal)
+	      | (Discard c) :: tail  => loop(remove_card(current_cards,c,IllegalMove),cards_left,tail)
+	      | Draw :: tail => case cards_left of
+				    [] => score(current_cards,goal)
+				  | c::rest => if sum_cards(c :: current_cards) > goal
+					       then score(c :: current_cards,goal)
+					       else loop((c :: current_cards), rest, tail)	    
+    in
+	loop([],cards,plays)
+    end
+	
+(* Chanllenge Problems *)
 
+fun score_challenge (xs,goal) =
+
+fun sum_cards_least xs =
+    let
+	fun local_helper (xs,acc) =
+	    case xs of
+		[] => acc
+	      | x :: xs' => case x of 
+				(_,Ace) => local_helper(xs', acc + 1)
+			      | (_,_) => local_helper(xs', acc + card_value(x))
+    in
+    end
+	
+    
+
+fun officiate_challenge (cards,plays,goal) =
+     let
+	fun loop (current_cards, cards_left, plays_left) =
+	    case plays_left of
+		[] => score_challenge(current_cards,goal)
+	      | (Discard c) :: tail  => loop(remove_card(current_cards,c,IllegalMove),cards_left,tail)
+	      | Draw :: tail => case cards_left of
+				    [] => score_challenge(current_cards,goal)
+				  | c::rest => if sum_cards_least(c :: current_cards) > goal
+					       then score_challenge(c :: current_cards,goal)
+					       else loop((c :: current_cards), rest, tail)	    
+    in
+	loop([],cards,plays)
+    end
+
+fun careful_player
+	
 	
