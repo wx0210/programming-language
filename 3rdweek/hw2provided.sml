@@ -111,38 +111,30 @@ fun officiate (cards, plays, goal) =
 	loop([],cards,plays)
     end
 	
-(* Chanllenge Problems *)
+(* Chanllenge Problems*)
 
 fun score_challenge (xs,goal) =
-
-fun sum_cards_least xs =
     let
-	fun local_helper (xs,acc) =
+	val raw_score = score(xs,goal)
+	fun best_score (score_list, best) =
+	    case score_list of
+		[] => best
+	      | s :: score_list' => if s < best
+				    then best_score(score_list', s)
+				    else best_score(score_list', best)
+
+	fun get_score preliminary =
+	    (if preliminary > goal then 3*(preliminary -goal) else goal - preliminary) div (if all_same_color(xs) then 2 else 1)
+
+	fun possible_score (xs,acc,prev) =
 	    case xs of
 		[] => acc
-	      | x :: xs' => case x of 
-				(_,Ace) => local_helper(xs', acc + 1)
-			      | (_,_) => local_helper(xs', acc + card_value(x))
+	      | (_,Ace) :: xs' =>possible_score (xs', get_score(prev-10) :: acc, prev -10)
+	      | _ :: xs' => possible_score(xs',acc,prev)	    
     in
+	best_score(possible_score(xs,[raw_score],raw_score),raw_score)
     end
 	
-    
 
-fun officiate_challenge (cards,plays,goal) =
-     let
-	fun loop (current_cards, cards_left, plays_left) =
-	    case plays_left of
-		[] => score_challenge(current_cards,goal)
-	      | (Discard c) :: tail  => loop(remove_card(current_cards,c,IllegalMove),cards_left,tail)
-	      | Draw :: tail => case cards_left of
-				    [] => score_challenge(current_cards,goal)
-				  | c::rest => if sum_cards_least(c :: current_cards) > goal
-					       then score_challenge(c :: current_cards,goal)
-					       else loop((c :: current_cards), rest, tail)	    
-    in
-	loop([],cards,plays)
-    end
 
-fun careful_player
-	
 	
