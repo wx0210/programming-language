@@ -124,19 +124,26 @@ fun score_challenge (xs,goal) =
 				    else best_score(score_list', best)
 
 	fun get_score preliminary =
-	    (if preliminary > goal then 3*(preliminary -goal) else goal - preliminary) div (if all_same_color(xs) then 2 else 1)
+	    (if preliminary > goal then 3 * (preliminary - goal) else goal - preliminary) div (if all_same_color(xs) then 2 else 1)
 
 	fun possible_score (xs,acc,prev) =
 	    case xs of
 		[] => acc
-	      | (_,Ace) :: xs' =>possible_score (xs', get_score(prev-10) :: acc, prev -10)
+	      | (_,Ace) :: xs' =>possible_score (xs', get_score(prev - 10) :: acc, prev - 10)
 	      | _ :: xs' => possible_score(xs',acc,prev)	    
     in
-	best_score(possible_score(xs,[raw_score],raw_score),raw_score)
+	best_score(possible_score(xs,[raw_score],sum_cards xs),raw_score)
     end
 
+fun sum_cards_least xs =
+    case xs of
+	[] => 0
+      | x :: xs' => case card_value x of
+			11 => 1 + sum_cards_least xs'
+		      | _ => card_value x + sum_cards_least xs'
+							    
 
-fun officiate_challenge (cards,play,goal) =
+fun officiate_challenge (cards,plays,goal) =
     let
 	fun loop (current_cards, cards_left, plays_left) =
 	    case plays_left of
