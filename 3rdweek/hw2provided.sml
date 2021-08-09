@@ -134,7 +134,21 @@ fun score_challenge (xs,goal) =
     in
 	best_score(possible_score(xs,[raw_score],raw_score),raw_score)
     end
-	
 
+
+fun officiate_challenge (cards,play,goal) =
+    let
+	fun loop (current_cards, cards_left, plays_left) =
+	    case plays_left of
+		[] => score_challenge(current_cards,goal)
+	      | (Discard c) :: tail  => loop(remove_card(current_cards,c,IllegalMove),cards_left,tail)
+	      | Draw :: tail => case cards_left of
+				    [] => score_challenge(current_cards,goal)
+				  | c::rest => if sum_cards_least(c :: current_cards) > goal
+					       then score_challenge(c :: current_cards,goal)
+					       else loop((c :: current_cards), rest, tail)	    
+    in
+	loop([],cards,plays)
+    end
 
 	
