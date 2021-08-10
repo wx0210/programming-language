@@ -158,4 +158,28 @@ fun officiate_challenge (cards,plays,goal) =
 	loop([],cards,plays)
     end
 
+fun careful_player (cl, goal) =
+    let
+	fun meet_condition (c,hl,sum) =
+	    case hl of
+		[] => NONE 
+	      | h :: hl' => if sum - card_value h + card_value c = goal
+			    then SOME h
+			    else meet_condition(c,hl',sum)
+					       
+	fun produce_mvl (hl,ccl,mvl) =
+	    case ccl of
+		[] => mvl
+	      | c :: ccl' => if goal - sum_cards hl >= card_value c
+			     then produce_mvl(c :: hl,ccl',mvl @ [Draw])
+			     else
+				 if goal > sum_cards hl
+				 then case meet_condition(c,hl,sum_cards hl) of
+					  NONE => mvl
+				       | SOME y => produce_mvl(remove_card(hl,y,IllegalMove),ccl,mvl @ [(Discard y)])
+				 else mvl
+			       					  
+    in
+	produce_mvl([],cl,[])
+    end
 	
