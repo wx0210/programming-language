@@ -39,6 +39,15 @@ datatype typ = Anything
 fun only_capitals xs = 
     List.filter (fn x => Char.isUpper(String.sub(x,0))) xs
 
-fun longest_string1 xs =
+fun longest_string2 xs =
     foldl(fn (x,y) => if String.size x < String.size y then y else x) "" xs
+
+fun longest_string1 xs =
+    foldl(fn (x,y) => if String.size x > String.size y then x else y) "" xs
+
+fun longest_string_helper
+
+fun longest_string3
+
+fun longest_string4
 	
