@@ -39,33 +39,24 @@ datatype typ = Anything
 fun only_capitals xs = 
     List.filter (fn x => Char.isUpper(String.sub(x,0))) xs
 
-fun longest_string2 xs =
-    foldl(fn (x,y) => if String.size x < String.size y then y else x) "" xs
-
 fun longest_string1 xs =
     foldl(fn (x,y) => if String.size x > String.size y then x else y) "" xs
 
-fun longest_string_helper f xs =
-    foldl f "" xs
- 
-val longest_string3 = longest_string_helper (fn (x,y) => if String.size x > String.size y then x else y) 
+fun longest_string2 xs =
+    foldl(fn (x,y) => if String.size x < String.size y then y else x) "" xs
 
-val longest_string4 = longest_string_helper (fn (x,y) => if String.size x < String.size y then y else x)
+fun longest_string_helper f xs =
+    foldl (fn (x,y) => if f(String.size x, String.size y) then x else y) "" xs
+ 
+val longest_string3 = longest_string_helper (fn (x,y) => x > y)
+
+val longest_string4 = longest_string_helper (fn (x,y) => x < y)
 
 val longest_capitalized = longest_string1 o only_capitals
 
-val rev_string = implode o rev o explode str
+val rev_string = String.implode o rev o String.explode
 
+					    
 					 
-    
-val test1 = only_capitals ["A","B","C"] = ["A","B","C"]
-
-val test2 = longest_string1 ["A","bc","C"] = "bc"
-
-val test3 = longest_string2 ["A","bc","C"] = "bc"
-
-val test4a = longest_string3 ["A","bc","C"] = "bc"
-
-val test4b = longest_string4 ["A","B","C"] = "C"
-
+ 
 
