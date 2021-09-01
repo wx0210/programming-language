@@ -68,9 +68,12 @@ fun all_answers f xs =
 	fun helper_function acc xs =
 	    case xs of
 		[] => SOME acc
-		   | x :: xs' =>  
+	      | x :: xs' => case f x of
+				SOME lst => helper_function (acc @ lst) xs'
+			      | NONE => NONE
+					    
     in
-	helper_fucntion [] xs
+	helper_function [] xs
     end
 	
 
