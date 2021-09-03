@@ -75,6 +75,12 @@ fun all_answers f xs =
     in
 	helper_function [] xs
     end
+
+val count_wildcards = g (fn _ => 1) (fn x => 0)
+			
+val count_wild_and_variable_lengths = g (fn _ => 1) (fn x => ) 
+	
+	
 	
 
 					 
