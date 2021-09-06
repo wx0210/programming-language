@@ -78,9 +78,26 @@ fun all_answers f xs =
 
 val count_wildcards = g (fn _ => 1) (fn x => 0)
 			
-val count_wild_and_variable_lengths = g (fn _ => 1) (fn x => ) 
+val count_wild_and_variable_lengths = g (fn _ => 1) (fn x => String.size x) 
 	
-	
+fun count_some_var (str,pat) = g (fn _ => 0) (fn x => if x = str then 1 else 0) pat
+    
+fun check_pat pattern =
+    let
+	fun p2s p =
+	    case p of
+		_ => []
+	      | Varriable x => [x]
+	      | TupleP ps => List.foldl(fn (acc,x) => acc @ (p2s x)) [] ps
+	      | ConstructorP (_,p) => p2s p
+
+        fun has_repeats xs =
+	    case xs of
+		[] => false
+		   |  => 
+    in
+	has_repeats(p2s pattern)
+    end
 	
 
 					 
