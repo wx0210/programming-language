@@ -70,8 +70,7 @@ fun all_answers f xs =
 		[] => SOME acc
 	      | x :: xs' => case f x of
 				SOME lst => helper_function (acc @ lst) xs'
-			      | NONE => NONE
-					    
+			      | NONE => NONE				    
     in
 	helper_function [] xs
     end
@@ -82,23 +81,26 @@ val count_wild_and_variable_lengths = g (fn _ => 1) (fn x => String.size x)
 	
 fun count_some_var (str,pat) = g (fn _ => 0) (fn x => if x = str then 1 else 0) pat
     
-fun check_pat pattern =
+fun check_pat (p : pattern) =
     let
-	fun p2s p =
+	fun p2s (p : pattern) =
 	    case p of
-		_ => []
-	      | Varriable x => [x]
-	      | TupleP ps => List.foldl(fn (acc,x) => acc @ (p2s x)) [] ps
-	      | ConstructorP (_,p) => p2s p
+	        Variable x => [x]
+	      | TupleP ps => List.foldl (fn (x,acc) => acc @ (p2s x)) [] ps
+	      | ConstructorP (_,p') => p2s p'
+	      | _ => []
 
         fun has_repeats xs =
 	    case xs of
 		[] => false
-		   |  => 
+	     |  x :: xs' => (List.exists (fn y => y = x) xs') orelse (has_repeats xs')
+									 
     in
-	has_repeats(p2s pattern)
+	has_repeats(p2s p)
     end
-	
+
+fun match (v : valu, p : pattern) =
+    
 
 					 
  
