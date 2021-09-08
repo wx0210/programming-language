@@ -50,7 +50,7 @@ fun longest_string_helper f xs =
  
 val longest_string3 = longest_string_helper (fn (x,y) => x > y)
 
-val longest_string4 = longest_string_helper (fn (x,y) => x < y)
+val longest_string4 = longest_string_helper (fn (x,y) => x >= y)
 
 val longest_capitalized = longest_string1 o only_capitals
 
@@ -96,12 +96,24 @@ fun check_pat (p : pattern) =
 	     |  x :: xs' => (List.exists (fn y => y = x) xs') orelse (has_repeats xs')
 									 
     in
-	has_repeats(p2s p)
+	not (has_repeats(p2s p))
     end
 
 fun match (v : valu, p : pattern) =
+    case (v,p) of
+	(_,Wildcard) => SOME []
+      | (v,Variable s) => SOME [(s,v)]
+      | (Unit,UnitP) => SOME []
+      | (Const x,ConstP y) => if x = y then SOME [] else NONE
+      | (Tuple vs,TupleP ps) => if List.length vs = List.length ps
+				then all_answers (fn (vs',ps') => match (vs',ps')) (ListPair.zip(vs,ps))
+				else NONE
+      | (Constructor(s2,v),ConstructorP(s1,p)) => if s1 = s2 then match (v,p) else NONE
+      | _ => NONE 
+			       
+fun first_match v ps =
+    SOME(first_answer (fn p => match(v,p)) ps) handle NoAnswer => NONE  
     
-
 					 
  
 
