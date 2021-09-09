@@ -36,17 +36,13 @@ datatype typ = Anything
 
 (**** you can put all your code here ****)
 
-fun only_capitals xs = 
-    List.filter (fn x => Char.isUpper(String.sub(x,0))) xs
+val only_capitals = List.filter (fn x => Char.isUpper(String.sub(x,0)))
 
-fun longest_string1 xs =
-    foldl(fn (x,y) => if String.size x > String.size y then x else y) "" xs
+val longest_string1 = foldl(fn (x,y) => if String.size x > String.size y then x else y) ""
 
-fun longest_string2 xs =
-    foldl(fn (x,y) => if String.size x < String.size y then y else x) "" xs
+val longest_string2 = foldl(fn (x,y) => if String.size x < String.size y then y else x) ""
 
-fun longest_string_helper f xs =
-    foldl (fn (x,y) => if f(String.size x, String.size y) then x else y) "" xs
+fun longest_string_helper f = foldl (fn (x,y) => if f(String.size x, String.size y) then x else y) ""
  
 val longest_string3 = longest_string_helper (fn (x,y) => x > y)
 
@@ -75,15 +71,15 @@ fun all_answers f xs =
 	helper_function [] xs
     end
 
-val count_wildcards = g (fn _ => 1) (fn x => 0)
+val count_wildcards = g (fn () => 1) (fn _ => 0)
 			
-val count_wild_and_variable_lengths = g (fn _ => 1) (fn x => String.size x) 
+val count_wild_and_variable_lengths = g (fn () => 1) (String.size) 
 	
-fun count_some_var (str,pat) = g (fn _ => 0) (fn x => if x = str then 1 else 0) pat
+fun count_some_var (str,pat) = g (fn () => 0) (fn x => if x = str then 1 else 0) pat
     
-fun check_pat (p : pattern) =
+fun check_pat p =
     let
-	fun p2s (p : pattern) =
+	fun p2s p =
 	    case p of
 	        Variable x => [x]
 	      | TupleP ps => List.foldl (fn (x,acc) => acc @ (p2s x)) [] ps
@@ -99,7 +95,7 @@ fun check_pat (p : pattern) =
 	not (has_repeats(p2s p))
     end
 
-fun match (v : valu, p : pattern) =
+fun match (v,p) =
     case (v,p) of
 	(_,Wildcard) => SOME []
       | (v,Variable s) => SOME [(s,v)]
@@ -112,8 +108,5 @@ fun match (v : valu, p : pattern) =
       | _ => NONE 
 			       
 fun first_match v ps =
-    SOME(first_answer (fn p => match(v,p)) ps) handle NoAnswer => NONE  
-    
-					 
- 
-
+    SOME (first_answer (fn p => match(v,p)) ps)
+    handle NoAnswer => NONE
