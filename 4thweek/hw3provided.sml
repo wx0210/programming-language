@@ -111,7 +111,49 @@ fun first_match v ps =
     SOME (first_answer (fn p => match(v,p)) ps)
     handle NoAnswer => NONE
 			   
-(*lack for challenge*)
+(*for challenge*)
+fun typecheck_patterns (dst, pst) =
+    let
+        fun infer x =
+            case x of
+                UnitP => UnitT
+               | ConstP _ => IntT
+               | TupleP ps => TupleT (List.map(infer) ps)
+               | ConstructorP(s,p) => 
+                    let
+                        val p1 = infer p
+                        fun verify_datatype dst =
+                            case dst of
+                                [] => raise NoAnswer
+                                | (x,y,z) :: dst' => if s = x andalso (z = p1 orelse p1 = Anything)
+                                                   then Datatype y
+                                                   else verify_datatype dst'
+                    in
+                        verify_datatype dst
+                    end
+               | _ => Anything
+        
+        fun more_lenient_type (t1,t2) =
+            case (t1,t2) of
+             (t1,Anything) => t1
+           | (Anything,t2) => t2
+           | (UnitT,UnitT) => UnitT
+           | (IntT,IntT)   => IntT
+           | (TupleT ps1, TupleT ps2) => if List.length(ps1) = List.length(ps2)
+                                         then TupleT (List.map (more_lenient_type) (ListPair.zip(ps1,ps2)))
+                                         else raise NoAnswer
+           | (Datatype dt1, Datatype dt2) => if dt1 = dt2
+                                             then t1
+                                             else raise NoAnswer
+           | _             =>  raise NoAnswer
+    in
+    case (dst, pst) of
+         ([],[])    => NONE
+       | (dst, pst)  => SOME (List.foldl (fn (t, acc) => more_lenient_type (t, acc)) 
+                                         Anything (List.map infer pst)) 
+                       handle NoAnswer => NONE
+    end
+
 			   
 
 			   
